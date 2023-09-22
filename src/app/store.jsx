@@ -5,7 +5,7 @@ import newsReducer from "../features/newsSlice"
 export const store =configureStore({
   reducer:{
     auth:authReducer,
-    news:newsReducer
+    api:newsReducer
   },
   devTools:process.env.NODE_DEV !== "production",
 })

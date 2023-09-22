@@ -1,44 +1,53 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-// import { getNews } from "./newsSlice";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
+import axios from "axios"
+
 const initialState = {
   news: [],
-  loading:true,
-  error:false
-};
+  loading: false,
+  error: false,
+}
+
 export const getNews = createAsyncThunk(
-  "getNewsFunc", //action type name
+  "getNewsFunc", //? action type name
+
   async () => {
-    const API_KEY = "a033b4ca75b345d6959e331522c91ece";
-    const url = "https://newsapi.org/v2/top-headlines?country=tr&apiKey=a033b4ca75b345d6959e331522c91ece";
-    const { data } = await axios(url);
-    console.log(data);
+    const API_KEY = "1a1a999e0d7240a6bd2dead87bcca78e"
+    const url = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${API_KEY}`
+
+    const { data } = await axios(url)
+    console.log(data)
+    return data.articles
   }
-);
+)
 
 const newsSlice = createSlice({
   name: "news",
   initialState,
   reducers: {
     clearNews: (state) => {
-      state.news = [];
+      state.news = []
     },
   },
+  //? createAyncThunk metedo bir middleware olarak API gibi dis kaynakli isteklerin redux ortaminda olsuturulmasini saglar. Ancak API^deki durumlara gore state'lerin guncellenmesini saglamaz. Bunun icin slice icersiindeki extraReducer kismi kullanilir.
+
+  //? API isteklerinde 3 farkli alt durum meydana gelir. Bunlar baslama (pending), basarili bitme (fullfilled) ve basariz bitme (rejected) dir.
+
   extraReducers: (builder) => {
-    builder.addCase(
-      (getNews.pending,
-      (state) => {
-        state.loading = true;
-      }))
-      .addCase((getNews.fulfilled,(state,action)=>{
-        state.news=action.payload
-        state.loading = false;
+    builder
+      .addCase(getNews.pending, (state) => {
+        state.loading = true
       })
-      )
-    
+      .addCase(getNews.fulfilled, (state, action) => {
+        state.news = action.payload
+        state.loading = false
+      })
+      .addCase(getNews.rejected, (state) => {
+        state.error = true
+        state.loading = false
+      })
   },
-});
+})
 
-export const { clearNews } = newsSlice.actions;
+export const { clearNews } = newsSlice.actions
 
-export default newsSlice.reducer;
+export default newsSlice.reducer
